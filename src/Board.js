@@ -31,23 +31,43 @@ import './Board.css';
 
 class Board extends Component {
 
+  static defaultProps = {
+    nrows : 5,
+    ncols : 5,
+    chanceLightStartsOn : 0.25
+  }
+
   constructor(props) {
     super(props);
 
     // TODO: set initial state
+    this.state = {
+      board : this.createBoard(),
+      hasWon : false
+    }
+    this.createBoard = this.createBoard.bind(this);
   }
 
   /** create a board nrows high/ncols wide, each cell randomly lit or unlit */
 
   createBoard() {
     let board = [];
+
     // TODO: create array-of-arrays of true/false values
-    return board
+    for(let i=0; i<this.props.nrows; i++) {
+      let row = [];
+      for(let j=0; j<this.props.ncols; j++) {
+        row.push((Math.random() < this.props.chanceLightStartsOn) ? true : false);
+      }
+      board.push(row);
+    }
+
+    return board;
   }
 
   /** handle changing a cell: update board & determine if winner */
 
-  flipCellsAround(coord) {
+  flipCellsAroundMe(coord) {
     let {ncols, nrows} = this.props;
     let board = this.state.board;
     let [y, x] = coord.split("-").map(Number);
@@ -62,10 +82,16 @@ class Board extends Component {
     }
 
     // TODO: flip this cell and the cells around it
+    flipCell(y, x);
+    flipCell(y, x+1);
+    flipCell(y, x-1);
+    flipCell(y+1, x);
+    flipCell(y-1, x);
+
 
     // win when every cell is turned off
-    // TODO: determine is the game has been won
-
+    // TODO: determine if the game has been won
+    let hasWon = false;
     this.setState({board, hasWon});
   }
 
@@ -73,12 +99,31 @@ class Board extends Component {
   /** Render game board or winning message. */
 
   render() {
-
+    
     // if the game is won, just show a winning msg & render nothing else
 
     // TODO
 
     // make table board
+    let tboard = [];
+
+      for(let i=0; i<this.props.nrows; i++) {
+        let row = [];
+        for(let j=0; j<this.props.ncols; j++) {
+          let coord = `${i}-${j}`;
+          row.push(<Cell isLit={this.state.board[i][j]} key={coord} flipCellsAroundMe = {() => this.flipCellsAroundMe(coord)} />);
+        }
+        tboard.push(<tr>{row}</tr>);
+      }
+
+    return (
+      <table className = "Board">
+        <tbody>
+          {tboard}
+        </tbody>
+      </table>
+    )
+    
 
     // TODO
   }
